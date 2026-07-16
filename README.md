@@ -38,3 +38,4 @@ All monetary differences are computed on the server as `budgeted - actual`; NET 
 
 Build the frontend with `npm run build`, deploy the repository to `/opt/my-custom-budget`, configure `backend/.env`, and create `/var/budget_reports` owned by `www-data`. Copy the included Nginx and systemd configurations, then run `sudo systemctl daemon-reload && sudo systemctl enable --now fastapi` and reload Nginx. Set `VITE_API_URL=/api` when building the production frontend.
 # Incom
+# Incom
