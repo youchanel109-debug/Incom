@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  body { @apply m-0 bg-slate-100 font-sans text-slate-800; }
+  button, input, select, textarea { font: inherit; }
+  button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer components {
+  .app-shell {
+    background-color: #f8fafc;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+    z-index: 0;
+  }
+  .app-shell::before,
+  .app-shell::after {
+    content: '';
+    position: fixed;
+    width: 50vw;
+    height: 50vw;
+    max-width: 600px;
+    max-height: 600px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.55;
+    animation: blob-bounce 25s infinite ease-in-out alternate;
+    pointer-events: none;
+  }
+  .app-shell::before {
+    background: rgba(99, 102, 241, 0.35); /* Indigo */
+    top: -15%;
+    left: -10%;
+  }
+  .app-shell::after {
+    background: rgba(56, 189, 248, 0.35); /* Sky */
+    bottom: -15%;
+    right: -10%;
+    animation-delay: -12s;
+    animation-direction: alternate-reverse;
+  }
+  .surface-card { @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg; }
+  .interactive-button { @apply transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98]; }
+  .table-row { @apply transition-colors duration-200 hover:bg-indigo-50/40; }
+  .focus-ring { @apply transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100; }
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fade-in 0.5s ease-out both;
+  }
+  .animate-slideUp {
+    animation: slide-up 0.55s ease-out both;
+  }
+  .animate-slideDown {
+    animation: slide-down 0.55s ease-out both;
+  }
+  .animate-scaleIn {
+    animation: scale-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-bgPulse {
+    animation: background-pulse 18s ease-in-out infinite;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes background-pulse {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes blob-bounce {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(50px, 80px) scale(1.1); }
+  66% { transform: translate(-40px, 100px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes login-loop {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(2px); }
+}
+
+.login-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 15%, rgba(99, 102, 241, 0.32), transparent 18rem),
+    radial-gradient(circle at 80% 25%, rgba(56, 189, 248, 0.22), transparent 16rem),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.88));
+  background-size: 240% 240%;
+  animation: login-loop 18s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2.4s ease-in-out infinite;
+}
+
+.animate-wave {
+  display: inline-block;
+  animation: wave 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

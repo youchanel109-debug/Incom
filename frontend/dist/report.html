@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Report — My Custom Budget</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<style>
+@page { size: A4 portrait; margin: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter','Noto Sans Khmer',sans-serif;
+  background:#E5E7EB;
+  display:flex;justify-content:center;padding:40px 0;
+  -webkit-font-smoothing:antialiased;
+}
+.page{
+  width:210mm;min-height:297mm;
+  background:#fff;
+  padding:45px 50px 35px;
+  box-shadow:0 20px 60px rgba(0,0,0,.12);
+  border-radius:4px;
+  position:relative;
+}
+
+/* Header */
+.report-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+.header-left{display:flex;gap:16px;align-items:flex-start}
+.wallet-icon{width:52px;height:52px;background:linear-gradient(135deg,#2563EB,#1D4ED8);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(37,99,235,.25)}
+.wallet-icon svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.header-title{font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.3px}
+.header-sub{font-size:12px;color:#64748B;margin-top:2px;font-weight:500;font-family:'Noto Sans Khmer',sans-serif}
+.header-month{font-size:13px;color:#2563EB;font-weight:600;margin-top:4px}
+.header-right{text-align:right;flex-shrink:0}
+.header-right .label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;font-weight:600}
+.header-right .value{font-size:14px;color:#0F172A;font-weight:600;margin-top:2px}
+.header-right .value.currency{font-size:18px;color:#2563EB;font-weight:800;margin-top:4px}
+.divider{height:1px;background:linear-gradient(90deg,#E5E7EB 0%,#2563EB 50%,#E5E7EB 100%);margin-bottom:28px;opacity:.4}
+
+/* Summary Cards */
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:30px}
+.summary-card{
+  border-radius:14px;padding:16px 18px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04);
+  border:1px solid rgba(0,0,0,.04);
+  transition:transform .15s;
+  position:relative;overflow:hidden;
+}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.summary-card.green{background:#F0FDF4;border-color:#BBF7D0}.summary-card.green::before{background:#16A34A}
+.summary-card.blue{background:#EFF6FF;border-color:#BFDBFE}.summary-card.blue::before{background:#2563EB}
+.summary-card.orange{background:#FFFBEB;border-color:#FDE68A}.summary-card.orange::before{background:#F59E0B}
+.summary-card.purple{background:#F5F3FF;border-color:#DDD6FE}.summary-card.purple::before{background:#7C3AED}
+.summary-card .icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.summary-card.green .icon-wrap{background:#DCFCE7}.summary-card.blue .icon-wrap{background:#DBEAFE}
+.summary-card.orange .icon-wrap{background:#FEF3C7}.summary-card.purple .icon-wrap{background:#EDE9FE}
+.summary-card .icon-wrap svg{width:18px;height:18px;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.summary-card.green .icon-wrap svg{stroke:#16A34A}
+.summary-card.blue .icon-wrap svg{stroke:#2563EB}
+.summary-card.orange .icon-wrap svg{stroke:#F59E0B}
+.summary-card.purple .icon-wrap svg{stroke:#7C3AED}
+.summary-card .s-label{font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.3px}
+.summary-card .s-value{font-size:20px;font-weight:800;margin-top:4px;letter-spacing:-.3px}
+.summary-card.green .s-value{color:#15803D}
+.summary-card.blue .s-value{color:#1D4ED8}
+.summary-card.orange .s-value{color:#B45309}
+.summary-card.purple .s-value{color:#6D28D9}
+
+/* Section */
+.section{margin-bottom:24px}
+.section-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;border-radius:10px 10px 0 0;
+  font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+}
+.section-header.green{background:#16A34A;color:#fff}
+.section-header.blue{background:#2563EB;color:#fff}
+.section-header.orange{background:#F59E0B;color:#fff}
+.section-header.purple{background:#7C3AED;color:#fff}
+.section-header svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Table */
+.table-wrap{
+  border:1px solid #E5E7EB;border-top:none;
+  border-radius:0 0 10px 10px;overflow:hidden;
+}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{
+  background:#F8FAFC;padding:9px 14px;
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  color:#64748B;text-align:left;border-bottom:1px solid #E5E7EB;
+}
+thead th:last-child{text-align:right}
+tbody td{
+  padding:8px 14px;color:#334155;border-bottom:1px solid #F1F5F9;
+  vertical-align:middle;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:#FAFBFC}
+tbody tr:hover{background:#F1F5F9}
+td:last-child{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+td .kh{font-family:'Noto Sans Khmer',sans-serif}
+.empty-state{text-align:center;padding:28px 14px;color:#94A3B8}
+.empty-state svg{width:36px;height:36px;stroke:#CBD5E1;margin-bottom:8px}
+.empty-state p{font-size:11px;color:#94A3B8;font-weight:500}
+
+/* Summary Total Card */
+.summary-total{
+  background:#F8FAFC;border:1px solid #E5E7EB;border-radius:14px;
+  padding:18px 22px;margin-top:20px;
+  box-shadow:0 1px 3px rgba(0,0,0,.03);
+}
+.summary-total h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;margin-bottom:12px}
+.summary-total-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.summary-total-item{}
+.summary-total-item .st-label{font-size:9px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:.2px}
+.summary-total-item .st-value{font-size:16px;font-weight:800;margin-top:2px;letter-spacing:-.2px}
+.summary-total-item .st-value.green{color:#16A34A}
+.summary-total-item .st-value.blue{color:#2563EB}
+.summary-total-item .st-value.orange{color:#F59E0B}
+.summary-total-item .st-value.purple{color:#7C3AED}
+.summary-total-item .st-value.dark{color:#0F172A}
+.summary-total-divider{width:1px;background:#E5E7EB}
+
+/* Footer */
+.report-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:20px;padding-top:14px;border-top:1px solid #E5E7EB;
+  font-size:9px;color:#94A3B8;font-weight:500;
+}
+.report-footer .right{text-align:right}
+
+/* Loading */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:600px;color:#64748B}
+.spinner{width:36px;height:36px;border:3px solid #E5E7EB;border-top-color:#2563EB;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toolbar */
+.toolbar{
+  position:fixed;top:16px;right:24px;z-index:999;
+  display:flex;gap:8px;
+}
+.toolbar button{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:10px;border:none;
+  font-size:13px;font-weight:600;cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+  transition:all .15s;
+}
+.toolbar .btn-png{background:#0F172A;color:#fff}
+.toolbar .btn-png:hover{background:#1E293B;transform:translateY(-1px)}
+.toolbar .btn-png:disabled{opacity:.5;cursor:wait;transform:none}
+.toolbar .btn-print{background:#fff;color:#0F172A;border:1px solid #E5E7EB}
+.toolbar .btn-print:hover{background:#F8FAFC}
+
+@media print{
+  body{background:#fff;padding:0}
+  .page{box-shadow:none;border-radius:0;padding:40px 45px 30px;width:100%;min-height:100vh}
+  .toolbar{display:none !important}
+}
+</style>
+</head>
+<body>
+<div class="toolbar" id="toolbar" style="display:none">
+  <button class="btn-png" id="exportPdfBtn" onclick="exportPdf()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Export PDF
+  </button>
+  <button class="btn-png" id="exportPngBtn" onclick="exportPng()" style="background:#1E293B">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+    Export PNG
+  </button>
+  <button class="btn-print" onclick="window.print()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Print / PDF
+  </button>
+</div>
+
+<div class="page" id="app">
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p style="font-size:13px;font-weight:500">Loading report…</p>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search)
+const month = params.get('month') || (() => {
+  const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`
+})()
+const autoFormat = params.get('format')
+
+const API = '/api'
+
+async function loadData() {
+  const [summary, items] = await Promise.all([
+    fetch(`${API}/budget/summary?month=${month}`).then(r => r.json()),
+    fetch(`${API}/budget/items?month=${month}`).then(r => r.json()),
+  ])
+  return { summary, items }
+}
+
+function fmt(v) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(v || 0)
+}
+
+function fmtDate(d) {
+  const [y, m] = d.split('-')
+  return new Date(y, m - 1).toLocaleString('en-US', { month: 'short', year: 'numeric' })
+}
+
+const ICONS = {
+  wallet: `<svg viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 1 0 0 4h4v-4Z"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  income: `<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
+  expenses: `<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
+  savings: `<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10h-10Z"/></svg>`,
+  net: `<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  arrowUp: `<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
+  arrowDown: `<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
+  banknote: `<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+  piggy: `<svg viewBox="0 0 24 24"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><circle cx="13" cy="11" r="1"/></svg>`,
+  scale: `<svg viewBox="0 0 24 24"><path d="m12 3-8 6 8 6 8-6-8-6z"/><path d="M4 15v4l8 4 8-4v-4"/></svg>`,
+}
+
+function section(title, color, items, icon) {
+  const rows = items.length
+    ? items.map(i => `<tr>
+      <td><span class="kh">${escHtml(i.category_name)}</span></td>
+      <td>${i.budget_month ? fmtDate(i.budget_month) : ''}</td>
+      <td><span class="kh">${escHtml(i.description)}</span></td>
+      <td>${fmt(i.actual)}</td>
+    </tr>`).join('')
+    : `<tr><td colspan="4" class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg>
+      <p>No records available</p>
+    </td></tr>`
+  return `<div class="section">
+    <div class="section-header ${color}">${ICONS[icon] || ''} ${title}</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Category</th><th>Date</th><th>Description</th><th>Actual</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`
+}
+
+function escHtml(s) {
+  if (!s) return ''
+  const d = document.createElement('div')
+  d.textContent = s
+  return d.innerHTML
+}
+
+async function exportPdf() {
+  const btn = document.getElementById('exportPdfBtn')
+  if (btn) { btn.disabled = true; btn.textContent = 'Exporting…' }
+  try {
+    const page = document.querySelector('.page')
+    const canvas = await html2canvas(page, {
+      scale: 2, useCORS: true, backgroundColor: '#fff',
+      logging: false, width: page.scrollWidth, height: page.scrollHeight,
+      windowWidth: page.scrollWidth, windowHeight: page.scrollHeight,
+    })
+    const imgData = canvas.toDataURL('image/jpeg', 0.95)
+    const { jsPDF } = window.jspdf
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pdfW = 210; const pdfH = 297
+    const imgW = pdfW - 0; const imgH = (canvas.height / canvas.width) * imgW
+    let y = 0; let pageNum = 1
+    while (y < imgH) {
+      if (pageNum > 1) pdf.addPage()
+      const h = Math.min(imgH - y, pdfH)
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgW, h, undefined, 'FAST')
+      y += pdfH
+      pageNum++
+    }
+    pdf.save(`budget-report-${month.slice(0, 7)}.pdf`)
+  } catch(e) {
+    alert('Failed to export PDF: ' + e.message)
+  }
+  if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Export PDF' }
+}
+
+async function exportPng() {
+  const btn = document.getElementById('exportPngBtn')
+  btn.disabled = true; btn.textContent = 'Exporting…'
+  try {
+    const page = document.querySelector('.page')
+    const canvas = await html2canvas(page, {
+      scale: 3, useCORS: true, backgroundColor: '#fff',
+      logging: false, width: page.scrollWidth, height: page.scrollHeight,
+      windowWidth: page.scrollWidth, windowHeight: page.scrollHeight,
+    })
+    const link = document.createElement('a')
+    link.download = `budget-report-${month.slice(0, 7)}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  } catch(e) {
+    alert('Failed to export PNG: ' + e.message)
+  }
+  btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg> Export PNG'
+}
+
+async function render() {
+  const el = document.getElementById('app')
+  try {
+    const { summary, items } = await loadData()
+    const monthLabel = fmtDate(month)
+    const generatedDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })
+
+    const income = items.filter(i => i.kind === 'income')
+    const expenses = items.filter(i => i.kind === 'expenses')
+    const savings = items.filter(i => i.kind === 'savings')
+    const custom = items.filter(i => i.kind === 'custom')
+
+    el.innerHTML = `
+      <div class="report-header">
+        <div class="header-left">
+          <div class="wallet-icon">${ICONS.wallet}</div>
+          <div>
+            <div class="header-title">My Custom Budget</div>
+            <div class="header-sub">របាយការណ៍ចំណូល និងចំណាយ</div>
+            <div class="header-month">${monthLabel}</div>
+          </div>
+        </div>
+        <div class="header-right">
+          <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:4px">
+            <span style="width:14px;height:14px;color:#2563EB">${ICONS.calendar}</span>
+            <span class="value">${generatedDate}</span>
+          </div>
+          <div class="label">Currency</div>
+          <div class="value currency">USD ($)</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="summary-grid">
+        <div class="summary-card green">
+          <div class="icon-wrap">${ICONS.arrowUp}</div>
+          <div class="s-label">Total Income</div>
+          <div class="s-value">${fmt(summary.total_income)}</div>
+        </div>
+        <div class="summary-card blue">
+          <div class="icon-wrap">${ICONS.arrowDown}</div>
+          <div class="s-label">Total Expenses</div>
+          <div class="s-value">${fmt(summary.total_expenses)}</div>
+        </div>
+        <div class="summary-card orange">
+          <div class="icon-wrap">${ICONS.piggy}</div>
+          <div class="s-label">Savings / Debt</div>
+          <div class="s-value">${fmt(summary.total_savings)}</div>
+        </div>
+        <div class="summary-card purple">
+          <div class="icon-wrap">${ICONS.scale}</div>
+          <div class="s-label">Net Balance</div>
+          <div class="s-value">${fmt(summary.net)}</div>
+        </div>
+      </div>
+
+      ${section('Income', 'green', income, 'arrowUp')}
+      ${section('Expenses', 'blue', expenses, 'arrowDown')}
+      ${section('Savings / Debt Payments', 'orange', savings, 'piggy')}
+      ${section('Custom Categories', 'purple', custom, 'banknote')}
+
+      <div class="summary-total">
+        <h3>Financial Summary</h3>
+        <div class="summary-total-grid">
+          <div class="summary-total-item">
+            <div class="st-label">Total Income</div>
+            <div class="st-value green">${fmt(summary.total_income)}</div>
+          </div>
+          <div class="summary-total-item">
+            <div class="st-label">Total Expenses</div>
+            <div class="st-value blue">${fmt(summary.total_expenses)}</div>
+          </div>
+          <div class="summary-total-item">
+            <div class="st-label">Savings / Debt</div>
+            <div class="st-value orange">${fmt(summary.total_savings)}</div>
+          </div>
+          <div class="summary-total-item">
+            <div class="st-label">Custom Categories</div>
+            <div class="st-value purple">${fmt(summary.total_custom)}</div>
+          </div>
+          <div class="summary-total-item">
+            <div class="st-label">Net Balance</div>
+            <div class="st-value dark">${fmt(summary.net)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-footer">
+        <div class="left">Income Management System</div>
+        <div class="right">Page 1 of 1</div>
+      </div>
+    `
+    document.getElementById('toolbar').style.display = 'flex'
+    if (autoFormat === 'pdf') setTimeout(exportPdf, 500)
+  } catch (e) {
+    el.innerHTML = `<div class="loading"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p style="font-size:13px;font-weight:500;color:#EF4444;margin-top:10px">Failed to load report</p><p style="font-size:11px;color:#94A3B8;margin-top:4px">${escHtml(e.message)}</p></div>`
+  }
+}
+
+render()
+</script>
+</body>
+</html>

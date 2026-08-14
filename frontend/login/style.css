@@ -1,0 +1,595 @@
+/* Autumn login page style and animation */
+:root {
+  --sky-top: #f9d3a8;
+  --sky-bottom: #7b3f2c;
+  --horizon: #f6a96b;
+  --hill-back: #a04d25;
+  --hill-front: #c85f20;
+  --tree-trunk: #8b4f2d;
+  --tree-dark: #9f5c24;
+  --leaf-warm: #f7b733;
+  --leaf-orange: #f97316;
+  --leaf-red: #d94f1b;
+  --leaf-brown: #8b4225;
+  --panel: rgba(255, 255, 255, 0.16);
+  --panel-border: rgba(255, 255, 255, 0.2);
+  --rgb-start: #ff7a54;
+  --rgb-mid: #f9c445;
+  --rgb-end: #5dd3ff;
+  --text-light: #f8f5ea;
+  --text-soft: #e7d7c3;
+  --text-muted: #d6c4a6;
+  --shadow: rgba(17, 24, 39, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.alert {
+  position: relative;
+  padding: 1rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.alert h4 {
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+
+.alert p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.alert-primary {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #dbeafe;
+}
+
+.alert-secondary {
+  background: rgba(107, 114, 128, 0.16);
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #ccfbf1;
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fee2e2;
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fef3c7;
+}
+
+.alert-info {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #dbeafe;
+}
+
+.alert-light {
+  background: rgba(241, 245, 249, 0.18);
+  border-color: rgba(226, 232, 240, 0.35);
+  color: #f8fafc;
+}
+
+.alert-dark {
+  background: rgba(15, 23, 42, 0.28);
+  border-color: rgba(17, 24, 39, 0.45);
+  color: #f8fafc;
+}
+
+.alert-dismissible {
+  padding-right: 3rem;
+}
+
+.alert-dismissible .btn-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.alert-dismissible .btn-close:hover {
+  opacity: 1;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: radial-gradient(circle at top, rgba(255, 220, 164, 0.45), transparent 25%), linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+  color: var(--text-light);
+  font-family: Inter, system-ui, sans-serif;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+body.loaded {
+  visibility: visible;
+}
+
+.scene {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sky,
+.sun-glow,
+.hills,
+.forest,
+.leaf-layer,
+.particle-layer,
+.login-card {
+  position: absolute;
+}
+
+.sky {
+  inset: 0;
+  background: radial-gradient(circle at 50% 10%, rgba(255, 248, 230, 0.65), transparent 20rem), radial-gradient(circle at 90% 15%, rgba(251, 146, 60, 0.18), transparent 22rem);
+  filter: blur(2px);
+}
+
+.sun-glow {
+  left: 50%;
+  top: 10%;
+  width: 28rem;
+  height: 28rem;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255, 211, 125, 0.3), transparent 55%);
+  animation: sun-float 12s ease-in-out infinite;
+}
+
+.hills {
+  width: 140%;
+  height: 40vh;
+  left: 50%;
+  bottom: -5vh;
+  transform: translateX(-50%);
+}
+
+.hills-back {
+  background: radial-gradient(circle at 20% 50%, rgba(195, 96, 39, 0.9), transparent 20rem), radial-gradient(circle at 80% 45%, rgba(206, 121, 47, 0.9), transparent 18rem);
+  border-radius: 50% 50% 0 0;
+  filter: blur(0.4px);
+  animation: hill-drift 24s ease-in-out infinite;
+  opacity: 0.95;
+}
+
+.hills-front {
+  width: 120%;
+  height: 38vh;
+  left: 50%;
+  bottom: -1vh;
+  background: radial-gradient(circle at 22% 40%, rgba(235, 113, 49, 0.95), transparent 18rem), radial-gradient(circle at 78% 50%, rgba(243, 111, 54, 0.95), transparent 16rem);
+  border-radius: 50% 50% 0 0;
+  filter: blur(0.5px);
+  animation: hill-drift 22s ease-in-out infinite reverse;
+  opacity: 1;
+}
+
+.forest {
+  inset: 0;
+  pointer-events: none;
+}
+
+.forest-back,
+.forest-front {
+  width: 100%;
+  height: 100%;
+}
+
+.tree.group {
+  position: absolute;
+  bottom: 0;
+  width: 9.2rem;
+  height: 22rem;
+  transform-origin: bottom center;
+  animation: tree-sway 10s ease-in-out infinite;
+}
+
+.tree.group .trunk {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 1.8rem;
+  height: 9.8rem;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #8b4e2d 0%, #6a361f 100%);
+  border-radius: 1rem 1rem 1.6rem 1.6rem;
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.08);
+}
+
+.tree.group .crown {
+  position: absolute;
+  left: 50%;
+  background: radial-gradient(circle at 40% 30%, rgba(252, 179, 70, 0.98), rgba(242, 105, 54, 0.94) 52%, rgba(167, 63, 36, 0.78));
+  border-radius: 50% 45% 55% 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 12px 32px rgba(31, 41, 55, 0.15);
+}
+
+.tree.group .crown-large {
+  width: 12rem;
+  height: 9.6rem;
+  top: -6rem;
+}
+
+.tree.group .crown-medium {
+  width: 9.2rem;
+  height: 7.6rem;
+  top: -3.4rem;
+  left: 52%;
+}
+
+.tree.group .crown-small {
+  width: 7.3rem;
+  height: 6.1rem;
+  top: -1.2rem;
+}
+
+.group-1 { left: 6%; transform: scale(0.78); animation-duration: 11s; }
+.group-2 { left: 22%; transform: scale(0.84); animation-duration: 12s; }
+.group-3 { left: 39%; transform: scale(0.72); animation-duration: 13s; }
+.group-4 { left: 58%; transform: scale(0.96); animation-duration: 9s; }
+.group-5 { left: 74%; transform: scale(1); animation-duration: 10.5s; }
+.group-6 { left: 88%; transform: scale(0.86); animation-duration: 11.5s; }
+
+.particle-layer {
+  inset: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 244, 214, 0.3);
+  border-radius: 50%;
+  filter: blur(0.8px);
+  opacity: 0.75;
+  animation: particle-drift 8s ease-in-out infinite;
+}
+
+.leaf-layer {
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.leaf {
+  position: absolute;
+  width: 2.2rem;
+  height: 2rem;
+  border-radius: 40% 60% 55% 45% / 45% 50% 50% 55%;
+  background: radial-gradient(circle at 30% 35%, rgba(251, 147, 35, 0.95), transparent 45%), radial-gradient(circle at 70% 50%, rgba(249, 115, 22, 0.94), transparent 45%), radial-gradient(circle at 50% 80%, rgba(191, 45, 12, 0.9), transparent 40%);
+  box-shadow: 0 12px 22px rgba(17, 24, 39, 0.2);
+  transform-origin: center;
+}
+
+.leaf::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 0.16rem;
+  height: 75%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  filter: blur(0.04rem);
+}
+
+.card-stack {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: min(460px, calc(100vw - 2rem));
+  z-index: 10;
+}
+
+.login-card,
+.profile-card {
+  position: relative;
+  width: 100%;
+  padding: 2.4rem;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 32px;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 36px 80px rgba(17, 24, 39, 0.22);
+  overflow: hidden;
+  animation: card-fade 0.9s ease-out both;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--rgb-start), var(--rgb-mid), var(--rgb-end), var(--rgb-start));
+  background-size: 300% 300%;
+  z-index: -1;
+  filter: blur(24px);
+  opacity: 0.75;
+  animation: rgb-glow 6.5s linear infinite;
+}
+
+.login-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.card-body {
+  padding: 0;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.95rem;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  font-size: 0.98rem;
+  outline: none;
+  transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease, background 0.24s ease;
+}
+
+.form-control:focus {
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.92rem 1.2rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, filter 0.24s ease, background 0.24s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff9f43 0%, #f97316 44%, #d9480f 100%);
+  color: #fff;
+  box-shadow: 0 20px 40px rgba(217, 79, 27, 0.28);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 28px 56px rgba(217, 79, 27, 0.35);
+}
+
+.btn-lg {
+  width: 100%;
+  font-size: 1rem;
+  padding: 1rem 1.2rem;
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.login-links {
+  margin-top: 1.45rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+
+.badge {
+  display: inline-flex;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffe6b1;
+  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  margin-bottom: 0.9rem;
+}
+
+.login-card h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  letter-spacing: -0.04em;
+}
+
+.login-card p {
+  margin: 1rem auto 0;
+  color: var(--text-soft);
+  line-height: 1.7;
+  max-width: 22rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.login-field {
+  display: grid;
+  gap: 0.55rem;
+  color: var(--text-light);
+}
+
+.login-field span {
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.login-field input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-light);
+  outline: none;
+  transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+}
+
+.login-field input::placeholder {
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.login-field input:focus {
+  border-color: rgba(251, 146, 60, 0.88);
+  box-shadow: 0 0 0 10px rgba(251, 146, 60, 0.12);
+  transform: translateY(-1px);
+}
+
+.login-button {
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #ff9f43 0%, #f97316 44%, #d9480f 100%);
+  box-shadow: 0 20px 40px rgba(217, 79, 27, 0.28);
+  cursor: pointer;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, filter 0.24s ease;
+}
+
+.login-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 28px 56px rgba(217, 79, 27, 0.35);
+}
+
+.login-links {
+  margin-top: 1.45rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+
+.login-links a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: color 0.22s ease;
+}
+
+.login-links a:hover {
+  color: #ffd88c;
+}
+
+@keyframes sun-float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+@keyframes hill-drift {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-51%) translateY(-3px); }
+}
+
+@keyframes tree-sway {
+  0%, 100% { transform: translateX(0) rotate(0.02rad); }
+  25% { transform: translateX(1%) rotate(0.01rad); }
+  50% { transform: translateX(0) rotate(-0.01rad); }
+  75% { transform: translateX(-1%) rotate(0.01rad); }
+}
+
+@keyframes particle-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.95); opacity: 0.7; }
+  50% { transform: translate3d(14px, 6px, 0) scale(1.05); opacity: 0.35; }
+}
+
+@keyframes card-fade {
+  from { opacity: 0; transform: translate(-50%, -52%) scale(0.98); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes rgb-glow {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 50% 20%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 80%; }
+}
+
+@media (max-width: 840px) {
+  .tree.group { width: 7.6rem; height: 18rem; }
+  .login-card { width: min(92vw, 420px); padding: 2rem; }
+}
+
+@media (max-width: 520px) {
+  body { overflow: auto; }
+  .scene { height: 100%; }
+  .login-card { width: min(92vw, 380px); padding: 1.8rem; }
+  .login-links { flex-direction: column; align-items: stretch; }
+}

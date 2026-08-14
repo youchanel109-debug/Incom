@@ -1,0 +1,13 @@
+[Unit]
+Description=My Custom Budget FastAPI API
+After=network.target mysql.service
+
+[Service]
+User=www-data
+WorkingDirectory=/opt/my-custom-budget/backend
+EnvironmentFile=/opt/my-custom-budget/backend/.env
+ExecStart=/opt/my-custom-budget/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
